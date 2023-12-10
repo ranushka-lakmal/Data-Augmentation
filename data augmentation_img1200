@@ -1,2 +1,44 @@
 from google.colab import drive
 drive.mount('/content/drive')
+
+
+!pip install tensorflow
+
+
+
+import os
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing import image
+
+
+
+datagen = ImageDataGenerator(
+    rotation_range=90,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    shear_range=0.2,
+    zoom_range=0.2,
+    horizontal_flip=True,
+    fill_mode='nearest'
+)
+
+
+
+
+input_folder = '/content/drive/MyDrive/MSc Research/Skin_Diseases/skin_data/train/Disease__leishmaniasis'  
+output_folder = '/content/drive/MyDrive/MSc Research/Skin_Diseases/skin_data/train/augmented_Disease__leishmaniasis' 
+
+images = os.listdir(input_folder)
+total_images_to_generate = 1200
+
+for image_name in images:
+    img_path = os.path.join(input_folder, image_name)
+    img = image.load_img(img_path)
+    x = image.img_to_array(img)
+    x = x.reshape((1,) + x.shape)
+
+    i = 0
+    for batch in datagen.flow(x, batch_size=1, save_to_dir=output_folder, save_prefix='aug', save_format='jpeg'):
+        i += 1
+        if i >= total_images_to_generate:
+            break
